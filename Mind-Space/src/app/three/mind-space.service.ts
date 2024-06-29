@@ -1,23 +1,34 @@
 import { ElementRef, Injectable, OnDestroy } from '@angular/core';
+import { RendererService } from './game-engine/renderer.service';
 import * as THREE from 'three';
-import { GameEngineService } from './game-engine.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MindSpaceService implements OnDestroy{
-  constructor(private gameEngineSVC: GameEngineService) { }
-  
-  ngOnDestroy(): void {
-    this.gameEngineSVC.destroy()
+export class MindSpaceService {
+  private scene: THREE.Scene;
+  private camera: THREE.Camera;
+
+  constructor(private renderer: RendererService) { }
+
+  destroy(): void {
+    this.renderer.destroy()
   }
 
   landingPage(canvas: ElementRef<HTMLCanvasElement>) {
-    this.gameEngineSVC.createScene(canvas);
-    this.gameEngineSVC.animate();
+    this.renderer.createScene(canvas, this.scene, this.camera);
+    this.renderer.animate();
   }
 
-  main(canvas: ElementRef<HTMLCanvasElement>) {
-    this.gameEngineSVC.createScene(canvas);
+  mainPage(canvas: ElementRef<HTMLCanvasElement>) {
+    this.renderer.createScene(canvas, this.scene, this.camera);
+    this.renderer.animate();
+
+    // this.renderer.onUpdate( (dt) => {
+    //   physics.step();
+    //   player.update(dt);
+    //   this.camera.update(player);
+    //   light.update(player);
+    // });
   }
 }

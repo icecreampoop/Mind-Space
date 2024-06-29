@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MindSpaceService } from '../../three/mind-space.service';
 
 @Component({
@@ -8,17 +8,14 @@ import { MindSpaceService } from '../../three/mind-space.service';
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.css'
 })
-export class MainPageComponent implements OnDestroy{
+export class MainPageComponent {
   @ViewChild('rendererCanvas', { static: true })
   public rendererCanvas!: ElementRef<HTMLCanvasElement>;
   
   constructor(private mindSpace: MindSpaceService) {}
-  
-  ngOnDestroy(): void {
-    this.mindSpace.ngOnDestroy();
-  }
 
   public ngOnInit(): void {
-    this.mindSpace.main(this.rendererCanvas);
+    this.mindSpace.destroy();
+    this.mindSpace.mainPage(this.rendererCanvas);
   }
 }
