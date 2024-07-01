@@ -28,7 +28,7 @@ export class RendererService {
     }
   }
 
-  public createScene(canvas: ElementRef<HTMLCanvasElement>, scene: THREE.Scene, camera: THREE.Camera) {
+  public createWorld(canvas: ElementRef<HTMLCanvasElement>, scene: THREE.Scene, camera: THREE.Camera) {
     // Getting the reference of the canvas element from our HTML document
     this.canvas = canvas.nativeElement;
     this.scene = scene;
