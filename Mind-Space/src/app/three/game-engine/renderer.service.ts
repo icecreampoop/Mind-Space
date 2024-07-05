@@ -50,7 +50,7 @@ export class RendererService {
 
   }
 
-  onUpdate(callback) {
+  public onUpdate(callback) {
     this.cbUpdate = callback
   }
 

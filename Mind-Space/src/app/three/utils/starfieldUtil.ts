@@ -32,8 +32,8 @@ export function blinkStarField(points: THREE.Points) {
   timeoutIds.push(timeoutId);
 }
 
-export function moveStarField(starfield: THREE.Points) {
-  const time = performance.now() * 0.0003;
+export function moveStarField(starfield: THREE.Points, speed: number) {
+  const time = performance.now() * speed;
   const positions = starfield.geometry.attributes['position'];
 
   for (let i = 0; i < positions.count; i++) {
@@ -41,7 +41,7 @@ export function moveStarField(starfield: THREE.Points) {
     const y = positions.getY(i);
     const z = positions.getZ(i);
 
-    const radius = 50;
+    const radius = 800;
     const speed = 0.1;
     const angle = time * speed + i * 0.1;
     const newX = Math.cos(angle) * radius;
@@ -54,10 +54,10 @@ export function moveStarField(starfield: THREE.Points) {
   positions.needsUpdate = true;
 }
 
-export default function createStarfield({ numStars = 1500 } = {}) {
+export default function createStarfield({ numStars = 2000 } = {}) {
   //function to generate the 3d position of star
   function randomSpherePoint() {
-    const radius = Math.random() * 25 + 25;
+    const radius = Math.random() * 500 + 500;
     const u = Math.random();
     const v = Math.random();
     const theta = 2 * Math.PI * u;
