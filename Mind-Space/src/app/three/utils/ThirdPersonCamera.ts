@@ -58,7 +58,7 @@ export function perspectiveCamera() {
   const near = 1.0;
   const far = 10000.0;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(25, 10, 25);
+  camera.position.set(0, 10, 0);
   
   return camera;
 }
