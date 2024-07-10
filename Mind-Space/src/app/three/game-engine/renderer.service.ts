@@ -54,6 +54,38 @@ export class RendererService {
     this.cbUpdate = callback
   }
 
+  public cleanUpScene() {
+    if (this.scene) {
+      while (this.scene.children.length > 0) {
+        const child = this.scene.children[0];
+        this.scene.remove(child);
+        this.disposeNode(child);
+      }
+    }
+  }
+
+  private disposeNode(node) {
+    if (node.geometry) {
+      node.geometry.dispose();
+    }
+    if (node.material) {
+      if (Array.isArray(node.material)) {
+        node.material.forEach(material => material.dispose());
+      } else {
+        node.material.dispose();
+      }
+    }
+    if (node.texture) {
+      node.texture.dispose();
+    }
+    if (node.children) {
+      while (node.children.length > 0) {
+        this.disposeNode(node.children[0]);
+        node.remove(node.children[0]);
+      }
+    }
+  }
+
   public animate(): void {
     // We have to run this outside angular zones,
     // because it could trigger heavy changeDetection cycles.
@@ -74,7 +106,7 @@ export class RendererService {
 
   private render(): void {
     const dt = this.clock.getDelta();
-    
+
     //if there is callback updates
     if (this.cbUpdate) {
       this.cbUpdate(dt)
@@ -95,5 +127,5 @@ export class RendererService {
 
     this.renderer.setSize(width, height);
   }
-  
+
 }

@@ -1,65 +1,40 @@
+import { ElementRef } from '@angular/core';
+import { Vec3 } from 'cannon-es';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-export class ThirdPersonCamera {
-  //third_person_camera itself returns the camera
-  //but constructor will need the player object to look at
-  private _player: any;
-  private _camera: THREE.PerspectiveCamera;
-  private _currentPosition: THREE.Vector3;
-  private _currentLookat: THREE.Vector3;
-
-  constructor(params, camera:THREE.PerspectiveCamera) {
-    this._player = params;
-    this._camera = camera;
-
-    this._currentPosition = new THREE.Vector3();
-    this._currentLookat = new THREE.Vector3();
-  }
-
-  _CalculateIdealOffset() {
-    const idealOffset = new THREE.Vector3(-0, 10, -15);
-    idealOffset.applyQuaternion(this._player.target._rotation);
-    idealOffset.add(this._player.target._position);
-    return idealOffset;
-  }
-
-  _CalculateIdealLookat() {
-    const idealLookat = new THREE.Vector3(0, 5, 20);
-    idealLookat.applyQuaternion(this._player.target._rotation);
-    idealLookat.add(this._player.target._position);
-    return idealLookat;
-  }
-
-  Update(timeElapsed) {
-    const idealOffset = this._CalculateIdealOffset();
-    const idealLookat = this._CalculateIdealLookat();
-
-    // const t = 0.05;
-    // const t = 4.0 * timeElapsed;
-    //change 0.01 to bigger like 0.1 for snappier cam movement
-    //or smaller if want to have longer transition/more frames
-    const t = 1.0 - Math.pow(0.01, timeElapsed);
-
-    this._currentPosition.lerp(idealOffset, t);
-    this._currentLookat.lerp(idealLookat, t);
-
-    this._camera.position.copy(this._currentPosition);
-    this._camera.lookAt(this._currentLookat);
-  }
-
-  public getCamera(){
-    return this._camera;
-  }
-}
+let orbitControl: OrbitControls;
 
 export function perspectiveCamera() {
   const fov = 60;
   const aspect = window.innerWidth / window.innerHeight;
   const near = 1.0;
-  const far = 10000.0;
+  const far = 1000.0;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(0, 10, 0);
-  
+
   return camera;
+}
+
+export function createOrbitControls(cam: THREE.Camera, canvas: ElementRef<HTMLCanvasElement>) {
+  orbitControl = new OrbitControls(cam, canvas.nativeElement);
+  orbitControl.enablePan = false;
+  orbitControl.enableZoom = false;
+  orbitControl.mouseButtons = {
+    LEFT: THREE.MOUSE.PAN,
+    RIGHT: THREE.MOUSE.ROTATE
+  };
+  orbitControl.minDistance = 10;
+  orbitControl.maxDistance = 10;
+  //prevent top down or bottom up, as it will bug out for movement
+  orbitControl.minPolarAngle = Math.PI * 0.15;
+  orbitControl.maxPolarAngle = Math.PI * 0.85;
+}
+
+export function updateOrbitControls(playerModel: THREE.Object3D<THREE.Object3DEventMap>) {
+  if (playerModel) {
+    orbitControl.target.copy(new Vec3(playerModel.position.x, playerModel.position.y + 5, playerModel.position.z));
+    orbitControl.update();
+  }
 }
 

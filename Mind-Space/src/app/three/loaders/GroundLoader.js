@@ -1,28 +1,32 @@
-import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d';
 import { PlaneGeometry, Mesh, MeshBasicMaterial } from 'three';
-import { physics } from '../utils/physics';
-
-
-const groundVisualMesh = new Mesh(
-    new PlaneGeometry(300, 300, 50, 50),
-    new MeshBasicMaterial({
-        wireframe: true,
-        transparent: true
-    })
-);
-
-//setting up variables required for physics
-const groundRigidBody = physics.createRigidBody(RigidBodyDesc.fixed());
-const geo = groundVisualMesh.geometry;
-const colliderDesc = ColliderDesc.trimesh(
-    new Float32Array(geo.attributes.position.array),
-    new Float32Array(geo.index.array)
-);
+import * as CANNON from 'cannon-es';
+import physicsWorld from '../utils/physics';
+import * as THREE from 'three';
 
 export function setupGround(scene) {
+    const groundVisualMesh = new Mesh(
+        new PlaneGeometry(300, 300, 100, 100),
+        new MeshBasicMaterial({
+            wireframe: true,
+            transparent: true
+        })
+    );
+
+    // Get the dimensions of the Three.js mesh
+    const boundingBox = new THREE.Box3().setFromObject(groundVisualMesh);
+    const dimensions = new THREE.Vector3();
+    boundingBox.getSize(dimensions);
+
+    const groundPhysicsBody = new CANNON.Body({
+        type: CANNON.Body.STATIC,
+        shape: new CANNON.Box(new CANNON.Vec3(dimensions.x / 2, dimensions.y / 2, 0.1))
+    })
+
     groundVisualMesh.rotation.x = -Math.PI / 2;
     scene.add(groundVisualMesh);
-    physics.createCollider(colliderDesc, groundRigidBody);
+    groundPhysicsBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+    groundPhysicsBody.position.set(0,-0.1,0);
+    physicsWorld.addBody(groundPhysicsBody);
 }
 
 

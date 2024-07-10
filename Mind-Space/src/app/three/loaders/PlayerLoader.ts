@@ -1,46 +1,86 @@
-import { Scene } from "three";
+import { AnimationAction, Object3D, Object3DEventMap, Scene } from "three";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-import { physics } from '../utils/physics';
 import { AnimationMixer } from "three";
+import * as CANNON from 'cannon-es';
+import physicsWorld from '../utils/physics';
 
 let loader = new FBXLoader();
-let playerModel;
-let mixers = [];
+let playerModel: Object3D<Object3DEventMap>;
+let sceneConst: Scene;
+let playerPhysicsBody: CANNON.Body;
+let mixer: AnimationMixer;
+const animationsMap: Map<string, AnimationAction> = new Map();
+
+export async function getPlayerMixer() {
+    return mixer;
+}
+
+export async function getPlayerAnimationsMap() {
+    return animationsMap;
+}
 
 export function loadPlayer(scene: Scene) {
+    sceneConst = scene;
     loader.setPath('./assets/');
-    loader.load('alien_soldier.fbx', (fbx) => {
-        fbx.scale.setScalar(0.1);
+    loader.load('mousey.fbx', (fbx) => {
+        fbx.scale.setScalar(0.05);
         playerModel = fbx;
-        fbx.traverse((child) => {
+        console.log('mousey loaded', fbx);
 
+        // List of FBX animation file paths
+        const fbxAnimationFiles = [
+            'mousey_breathing_idle.fbx',
+            'mousey_punch1.fbx',
+            'mousey_run.fbx'
+        ];
+
+        mixer = new AnimationMixer(playerModel);
+        
+        const animLoader = new FBXLoader();
+        animLoader.setPath('./assets/');
+        
+        fbxAnimationFiles.forEach((filePath) => {
+            animLoader.load(filePath, (fbx) => {
+                const animationClip = fbx.animations[0]; // assuming one animation per FBX file
+
+                const action = mixer.clipAction(animationClip);
+                animationsMap.set(filePath.split(".")[0], action);
+            });
         });
 
-
-        const anim = new FBXLoader();
-        anim.setPath('./assets/');
-        anim.load('breathing_idle.fbx', (anim) => {
-            const m = new AnimationMixer(fbx);
-            mixers.push(m);
-            const idle = m.clipAction(anim.animations[0]);
-            idle.play();
-        });
     });
+
+    //phsyics body
+    const radiusTop = 1.5
+    const radiusBottom = 1.5
+    const height = 6.5
+    const numSegments = 12
+    const cylinderShape = new CANNON.Cylinder(radiusTop, radiusBottom, height, numSegments)
+    playerPhysicsBody = new CANNON.Body({
+        shape: cylinderShape,
+        type: CANNON.Body.KINEMATIC
+    })
+    playerPhysicsBody.position.set(0, 6.5 / 2, 0);
+    physicsWorld.addBody(playerPhysicsBody);
+}
+
+export function showPlayer() {
+    if (playerModel) {
+        sceneConst.add(playerModel);
+    }
+}
+
+//probs can collapse this and mixer into one
+export function updatePlayerMovement() {
+    if (playerModel) {
+        playerModel.position.copy(new CANNON.Vec3(playerPhysicsBody.position.x, 0, playerPhysicsBody.position.z));
+    }
 }
 
 export function getPlayerModel() {
     return playerModel;
 }
 
-function createRapierCollider(geometry) {
-    const vertices = geometry.attributes.position.array;
-    const indices = geometry.index.array;
-
-    // Create a Rapier collider from the vertices and indices
-    const colliderDesc = physics.ColliderDesc.trimesh(vertices, indices);
-    const rigidBodyDesc = physics.RigidBodyDesc.dynamic();
-
-    // Add the collider to the world
-    const rigidBody = physics.createRigidBody(rigidBodyDesc);
-    physics.createCollider(colliderDesc, rigidBody);
+export function getPlayerPhysicsBody() {
+    return playerPhysicsBody;
 }

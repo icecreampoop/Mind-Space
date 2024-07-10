@@ -3,10 +3,12 @@ import { RendererService } from './game-engine/renderer.service';
 import * as THREE from 'three';
 import { blinkAllStarFields, loadStarfield, updateStarfield } from './loaders/starfieldLoader';
 import { stopRecursiveStarfieldBlink } from './utils/StarfieldUtil';
-import { perspectiveCamera, ThirdPersonCamera } from './utils/ThirdPersonCamera';
+import { createOrbitControls, perspectiveCamera, updateOrbitControls } from './utils/ThirdPersonCamera';
 import { setupGround } from './loaders/GroundLoader';
-import { physics } from './utils/physics';
-import { getPlayerModel, loadPlayer } from './loaders/PlayerLoader';
+import { getPlayerModel, loadPlayer, showPlayer, updatePlayerMovement } from './loaders/PlayerLoader';
+import physicsWorld, { cleanUpPhysics } from './utils/physics';
+import CannonDebugger from 'cannon-es-debugger'
+import { CharacterControls } from './utils/CharacterControls';
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +16,12 @@ import { getPlayerModel, loadPlayer } from './loaders/PlayerLoader';
 export class MindSpaceService {
   private scene = new THREE.Scene();
   private cam: any;
-  private worldPhysics;
-  
-  constructor(private renderer: RendererService) { 
+  private light = new THREE.AmbientLight(0xffffff, 1.5);
+  private characterControls: CharacterControls;
+  private cannonDebugger = CannonDebugger(this.scene, physicsWorld);
+
+  constructor(private renderer: RendererService) {
     this.cam = perspectiveCamera();
-    this.loadPhysics();
-
-  }
-
-  async loadPhysics() {
-    this.worldPhysics = await physics;
   }
 
   destroy(): void {
@@ -33,18 +31,22 @@ export class MindSpaceService {
 
   landingPage(canvas: ElementRef<HTMLCanvasElement>) {
     this.destroy();
+    //i hate js so much why is it async, causing issues with cleanup code
+    this.renderer.cleanUpScene();
+    cleanUpPhysics().then(() => {
+      setupGround(this.scene);
+    });
 
     loadStarfield(this.scene);
     blinkAllStarFields();
-    setupGround(this.scene);
     loadPlayer(this.scene);
 
     this.renderer.createWorld(canvas, this.scene, this.cam);
     this.renderer.animate();
 
-    this.renderer.onUpdate( (dt) => {
+    this.renderer.onUpdate((dt) => {
       updateStarfield();
-      this.worldPhysics.step();
+      this.cannonDebugger.update();
     });
   }
 
@@ -52,15 +54,22 @@ export class MindSpaceService {
     this.destroy();
 
     blinkAllStarFields();
-    this.cam = new ThirdPersonCamera(getPlayerModel(), this.cam);
+    this.scene.add(this.light);
+    createOrbitControls(this.cam, canvas);
+    showPlayer();
 
-    this.renderer.createWorld(canvas, this.scene, this.cam.getCamera());
+    this.renderer.createWorld(canvas, this.scene, this.cam);
     this.renderer.animate();
 
-    this.renderer.onUpdate( (dt) => {
+    this.characterControls = new CharacterControls('mousey_breathing_idle', this.cam);
+
+    this.renderer.onUpdate((dt) => {
+      this.characterControls.update(dt);
+      updateOrbitControls(getPlayerModel());
+      updatePlayerMovement();
       updateStarfield();
-      this.worldPhysics.step();
-      this.cam.Update(dt);
+      physicsWorld.fixedStep();
+      this.cannonDebugger.update();
     });
   }
 }
