@@ -3,7 +3,7 @@ import * as CANNON from 'cannon-es';
 let physicsWorld: CANNON.World;
 
 export default physicsWorld = new CANNON.World({
-  gravity: new CANNON.Vec3(0, -9.82, 0),
+  gravity: new CANNON.Vec3(0, -30.82, 0),
 })
 
 export async function cleanUpPhysics() {

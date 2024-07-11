@@ -58,7 +58,7 @@ export class MindSpaceService {
     this.scene.add(this.light);
     createOrbitControls(this.cam, canvas);
     showPlayer();
-    loadGameLogic();
+    loadGameLogic(this.scene);
 
     this.renderer.createWorld(canvas, this.scene, this.cam);
     this.renderer.animate();
@@ -70,7 +70,7 @@ export class MindSpaceService {
       updateOrbitControls(getPlayerModel());
       updatePlayerMovement();
       updateStarfield();
-      updateGameLogic();
+      updateGameLogic(dt);
       physicsWorld.fixedStep();
       this.cannonDebugger.update();
     });

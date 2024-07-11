@@ -15,6 +15,7 @@ export class CharacterControls {
     private currentAction: string
     private play = 'mousey_breathing_idle';
     private punchQuaternion: THREE.QuaternionLike;
+    private punchStateLock = false;
 
     // temporary data
     private walkDirection = new THREE.Vector3()
@@ -49,6 +50,10 @@ export class CharacterControls {
         }, false);
         document.addEventListener('keyup', (event) => {
             (this.keysPressed as any)[event.key.toLowerCase()] = false
+
+            if (event.key.toLowerCase() == ' '){
+                this.punchStateLock = false;
+            }
         }, false);
 
     }
@@ -74,13 +79,14 @@ export class CharacterControls {
 
         if (directionPressed) {
             this.play = 'mousey_run'
-        } else if (this.keysPressed[" "]) {
+        } else if (this.keysPressed[" "] && !this.punchStateLock) {
             //cannot really alternate and no time alr bru
             this.play = 'mousey_punch1';
-
+            this.punchStateLock = true;
+            
         } else if (this.keysPressed["q"] && this.dashCooldown <= 0) {
             this.play = 'mousey_dash'
-            this.dashCooldown = 5;
+            this.dashCooldown = 3;
             this.dashCDSwitch = true;
         } else {
             this.play = 'mousey_breathing_idle'
@@ -142,7 +148,7 @@ export class CharacterControls {
                         //logic for hit detection
                         getPunchHitBox().velocity.set(0, 0, 0);
                         //this controls power of the punch
-                        this.forwardOffset = new THREE.Vector3(0, 3, 100);
+                        this.forwardOffset = new THREE.Vector3(0, 300, 200);
                         getPunchHitBox().collisionResponse = true;
                         this.punchQuaternion = getPlayerModel().quaternion;
                         getPunchHitBox().quaternion.set(this.punchQuaternion.x, this.punchQuaternion.y, this.punchQuaternion.z, this.punchQuaternion.w);
