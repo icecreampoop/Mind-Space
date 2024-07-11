@@ -9,6 +9,7 @@ import { getPlayerModel, loadPlayer, showPlayer, updatePlayerMovement } from './
 import physicsWorld, { cleanUpPhysics } from './utils/physics';
 import CannonDebugger from 'cannon-es-debugger'
 import { CharacterControls } from './utils/CharacterControls';
+import { loadGameLogic, updateGameLogic } from './loaders/GameLogicLoader';
 
 @Injectable({
   providedIn: 'root'
@@ -35,11 +36,11 @@ export class MindSpaceService {
     this.renderer.cleanUpScene();
     cleanUpPhysics().then(() => {
       setupGround(this.scene);
+      loadPlayer(this.scene);
     });
 
     loadStarfield(this.scene);
     blinkAllStarFields();
-    loadPlayer(this.scene);
 
     this.renderer.createWorld(canvas, this.scene, this.cam);
     this.renderer.animate();
@@ -57,6 +58,7 @@ export class MindSpaceService {
     this.scene.add(this.light);
     createOrbitControls(this.cam, canvas);
     showPlayer();
+    loadGameLogic();
 
     this.renderer.createWorld(canvas, this.scene, this.cam);
     this.renderer.animate();
@@ -68,6 +70,7 @@ export class MindSpaceService {
       updateOrbitControls(getPlayerModel());
       updatePlayerMovement();
       updateStarfield();
+      updateGameLogic();
       physicsWorld.fixedStep();
       this.cannonDebugger.update();
     });

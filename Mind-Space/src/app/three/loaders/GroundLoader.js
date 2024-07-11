@@ -5,7 +5,7 @@ import * as THREE from 'three';
 
 export function setupGround(scene) {
     const groundVisualMesh = new Mesh(
-        new PlaneGeometry(300, 300, 100, 100),
+        new PlaneGeometry(200, 200, 100, 100),
         new MeshBasicMaterial({
             wireframe: true,
             transparent: true
