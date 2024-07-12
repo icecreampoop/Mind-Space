@@ -1,8 +1,0 @@
-/* You can add global styles to this file, and also import other style files */
-
-/* was adding this here to help with the flicker between pages but BITCH DOES IT NOT HELP */
-/* cool though so imma leave it */
-html, body {
-    background-color: black;
-    color: white; /* Setting text color to white for better visibility */
-}
