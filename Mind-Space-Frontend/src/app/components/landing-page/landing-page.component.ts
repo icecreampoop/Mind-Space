@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MindSpaceService } from '../../three/mind-space.service';
+import { MindSpaceService } from '../../services/mind-space.service';
 
 @Component({
   selector: 'app-landing-page',

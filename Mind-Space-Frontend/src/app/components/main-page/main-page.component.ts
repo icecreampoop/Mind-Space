@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MindSpaceService } from '../../three/mind-space.service';
+import { MindSpaceService } from '../../services/mind-space.service';
 
 @Component({
   selector: 'app-main-page',

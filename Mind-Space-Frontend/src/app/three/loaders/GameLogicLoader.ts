@@ -38,7 +38,10 @@ export function loadGameLogic(scene: Scene) {
     scene.add(groundVisualMesh);
 }
 
-export function updateGameLogic(dt) {
+export function updateGameLogic(dt) : boolean {
+    //hack work around injection
+    let damage = false;
+
     gameTime += dt;
     spawnTimer += dt;
     frequencyTimer += dt;
@@ -51,10 +54,11 @@ export function updateGameLogic(dt) {
             physicsWorld.removeBody(enemyArray[key].getHostileBallPhysicsBody());
             delete enemyArray[key];
         } else {
-            enemyArray[key].updateBallAI(dt, enemyArray, sceneRef);
+            if (enemyArray[key].updateBallAI(dt, enemyArray, sceneRef)){
+                damage = true;
+            }
         }
     }
-
 
     //spawn balls
     if (spawnTimer >= spawnFrequency) {
@@ -68,6 +72,8 @@ export function updateGameLogic(dt) {
         frequencyTimer = 0;
         spawnFrequency -= 0.25;
     }
+
+    return damage;
 }
 
 function addBallToWorld() {

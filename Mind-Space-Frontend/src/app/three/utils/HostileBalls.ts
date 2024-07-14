@@ -61,7 +61,7 @@ export class HostileBalls {
         return this.ballVisualMesh;
     }
 
-    updateBallAI(dt, enemyArray, scene: Scene) {
+    updateBallAI(dt, enemyArray, scene: Scene) : boolean{
         //update visual mesh
         this.ballVisualMesh.position.copy(this.physicsBalldy.position);
         this.ballVisualMesh.quaternion.copy(this.physicsBalldy.quaternion);
@@ -98,7 +98,8 @@ export class HostileBalls {
                     physicsWorld.removeBody(this.physicsBalldy);
                     delete enemyArray[this.physicsBalldy.id];
                     
-                    console.log('dead on next baby boom')
+                    //hack workaround for damage
+                    return true;
                 }
 
 
@@ -124,6 +125,7 @@ export class HostileBalls {
 
         }
 
+        return false;
     }
 
 }
