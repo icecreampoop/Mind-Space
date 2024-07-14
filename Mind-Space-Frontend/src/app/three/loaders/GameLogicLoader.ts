@@ -38,7 +38,7 @@ export function loadGameLogic(scene: Scene) {
     scene.add(groundVisualMesh);
 }
 
-export function updateGameLogic(dt) : boolean {
+export function updateGameLogic(dt): boolean {
     //hack work around injection
     let damage = false;
 
@@ -54,7 +54,7 @@ export function updateGameLogic(dt) : boolean {
             physicsWorld.removeBody(enemyArray[key].getHostileBallPhysicsBody());
             delete enemyArray[key];
         } else {
-            if (enemyArray[key].updateBallAI(dt, enemyArray, sceneRef)){
+            if (enemyArray[key].updateBallAI(dt, enemyArray, sceneRef)) {
                 damage = true;
             }
         }
@@ -81,4 +81,16 @@ function addBallToWorld() {
     enemyArray[ball.getHostileBallPhysicsBody().id] = ball;
     physicsWorld.addBody(ball.getHostileBallPhysicsBody());
     sceneRef.add(ball.getHostileBallVisualMesh())
+}
+
+export function resetGameLogic() {
+    enemyArray = {};
+    gameTime = 0;
+    spawnTimer = 0;
+    spawnFrequency = 5;
+    frequencyTimer = 0;
+}
+
+export function getGameTimeForScore(){
+    return gameTime;
 }

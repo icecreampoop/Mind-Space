@@ -1,8 +1,5 @@
 <canvas #rendererCanvas id="rendererCanvas"></canvas>
 
-<h1>main page</h1>
-
-
-
-
-
+@if (gameStateStore.gameState() === "game end") {
+    <app-game-end-view></app-game-end-view>
+}

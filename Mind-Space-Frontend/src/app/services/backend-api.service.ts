@@ -5,5 +5,5 @@ import { Injectable } from '@angular/core';
 })
 export class BackendApiService {
 
-  constructor(httpClient: HTTPC) { }
+  //constructor(httpClient: HTTPC) { }
 }

@@ -1,19 +1,23 @@
 import { patchState, signalStore, withMethods, withState } from "@ngrx/signals";
 
 type GameState = {
-    gameState: 'landing page' | 'gaming' | 'game end';
+    gameState: 'landing page' | 'logging in' | 'gaming' | 'game end';
     playerHP: number;
     loggedIn: boolean;
     spinner: boolean;
-    userName: string;
+    username: string;
     password: string;
+    userHighScore: number;
 }
 
 const initialGameState: GameState = {
     gameState: 'landing page',
     playerHP: 2,
     loggedIn: false,
-    spinner: false
+    spinner: false,
+    username: '',
+    password: '',
+    userHighScore: 0
 }
 
 export const GameStateStore = signalStore(
@@ -41,6 +45,30 @@ export const GameStateStore = signalStore(
 
             reducePlayerHP() {
                 patchState(_store, {playerHP: _store.playerHP()-1})
+            },
+
+            resetPlayerHP() {
+                patchState(_store, {playerHP: 2})
+            },
+
+            //call backend api, if backend say ok, save the username n pw to the state
+            setUsernamePW(username: string, password: string) {
+                patchState(_store, {username: username, password: password})
+            },
+
+            //when logged out just reset to nth and go to landing page
+            userLogOut() {
+                patchState(_store, initialGameState)
+            },
+
+
+            async setHighScore(score: number) {
+                if (score > _store.userHighScore()){
+                    patchState(_store, {userHighScore: score})
+                }
+
+                //call backend
+                
             }
         })
     )

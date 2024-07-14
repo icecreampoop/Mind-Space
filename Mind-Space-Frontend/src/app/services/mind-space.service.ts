@@ -9,7 +9,7 @@ import { getPlayerModel, loadPlayer, showPlayer, updatePlayerMovement } from '..
 import physicsWorld, { cleanUpPhysics } from '../three/utils/physics';
 //import CannonDebugger from 'cannon-es-debugger'
 import { CharacterControls } from '../three/utils/CharacterControls';
-import { loadGameLogic, updateGameLogic } from '../three/loaders/GameLogicLoader';
+import { loadGameLogic, resetGameLogic, updateGameLogic } from '../three/loaders/GameLogicLoader';
 import { GameStateStore } from '../ngrx-signal-store/gamestate.store';
 
 @Injectable({
@@ -17,7 +17,7 @@ import { GameStateStore } from '../ngrx-signal-store/gamestate.store';
 })
 export class MindSpaceService {
   private scene = new THREE.Scene();
-  private cam: any;
+  private cam: THREE.PerspectiveCamera;
   private light = new THREE.AmbientLight(0xffffff, 1.5);
   private characterControls: CharacterControls;
   private gameStateStore = inject(GameStateStore);
@@ -30,6 +30,30 @@ export class MindSpaceService {
   destroy(): void {
     this.renderer.destroy()
     stopRecursiveStarfieldBlink();
+    resetGameLogic();
+  }
+
+  //for support me and how to play view, is just no load player
+  starsBackground(canvas: ElementRef<HTMLCanvasElement>) {
+    this.destroy();
+    //i hate js so much why is it async, causing issues with cleanup code
+    this.renderer.cleanUpScene();
+    cleanUpPhysics().then(() => {
+      setupGround(this.scene);
+    });
+
+    //reset camera each time redirect so look nicer
+    this.cam.position.set(0, 10, 0);
+    loadStarfield(this.scene);
+    blinkAllStarFields();
+
+    this.renderer.createWorld(canvas, this.scene, this.cam);
+    this.renderer.animate();
+
+    this.renderer.onUpdate((dt) => {
+      updateStarfield();
+      //this.cannonDebugger.update();
+    });
   }
 
   landingPage(canvas: ElementRef<HTMLCanvasElement>) {
@@ -41,6 +65,8 @@ export class MindSpaceService {
       loadPlayer(this.scene);
     });
 
+    //reset camera each time redirect so look nicer
+    this.cam.position.set(0, 10, 0);
     loadStarfield(this.scene);
     blinkAllStarFields();
 
@@ -79,8 +105,6 @@ export class MindSpaceService {
         this.gameStateStore.reducePlayerHP();
       }
       if (0 >= this.gameStateStore.playerHP()) {
-        consol
-        //do screen popup here w logic
         this.gameStateStore.changeGameState("game end")
       }
 
