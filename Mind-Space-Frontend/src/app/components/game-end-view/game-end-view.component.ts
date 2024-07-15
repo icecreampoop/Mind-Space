@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-game-end-view',
@@ -7,6 +7,14 @@ import { Component } from '@angular/core';
   templateUrl: './game-end-view.component.html',
   styleUrl: './game-end-view.component.css'
 })
-export class GameEndViewComponent {
+export class GameEndViewComponent implements OnDestroy, OnInit{
 
+  ngOnDestroy(): void {
+    //unsub from observable
+    
+  }
+
+  ngOnInit(): void {
+    //sub to backend api observable
+  }
 }

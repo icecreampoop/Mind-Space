@@ -8,7 +8,7 @@ import { LandingPageComponent } from "./components/landing-page/landing-page.com
     standalone: true,
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    imports: [RouterOutlet, StatsComponent, LandingPageComponent]
+    imports: [ RouterOutlet, StatsComponent, LandingPageComponent]
 })
 export class AppComponent implements AfterViewInit{
   statsCheckVisible: boolean = false;

@@ -1,3 +1,22 @@
+@if ("highScoreOfTheDay$ | async") {
+    <p>Loaded</p>
+@for (score of highScoreOfTheDay$; track $index) {
+    
+}
+} @else {
+    <p>Loading...</p>
+}
+
+@if ("allTimeHighScore$ | async") {
+    <p>Loaded</p>
+@for (score of allTimeHighScore$; track $index) {
+    
+}
+} @else {
+    <p>Loading...</p>
+}
+
+<!-- if havent log in state show login/create acc buttons -->
 <div class="container">
     <div class="row mt-5 pt-5">
         <div class="col mt-5">
@@ -10,11 +29,14 @@
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-end">
-            <a routerLink="/how-to-play" class="btn btn-outline-light btn-lg mb-3">How To Play</a>
-        </div>
-        <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-start">
-            <a routerLink="/support-me" class="btn btn-outline-light btn-lg mb-3">Support Me</a>
-        </div>
+
+        <button class="btn btn-outline-light btn-lg mb-3" (click)="createAccount()">Make New Account</button>
+
+
+        <button class="btn btn-outline-light btn-lg mb-3" (click)="login()">Login</button>
+
     </div>
 </div>
+
+<!-- if logged in state === true show only high scores of the day/high score all time/personal high score
+and play button -->

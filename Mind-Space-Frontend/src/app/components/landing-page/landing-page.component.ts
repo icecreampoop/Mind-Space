@@ -28,13 +28,17 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.mindSpace.landingPage(this.rendererCanvas);
   }
 
-  login() {
+  loginView() {
     this.gameStateStore.changeGameState("logging in");
   }
 
   playAsGuest() {
     this.gameStateStore.changeGameState("gaming");
     this.router.navigate(['/main'])
+  }
+
+  logOut() {
+    this.gameStateStore.userLogOut();
   }
 
 }
