@@ -1,4 +1,4 @@
-import { ElementRef, inject, Injectable } from '@angular/core';
+import { ElementRef, inject, Injectable, signal } from '@angular/core';
 import { RendererService } from '../three/game-engine/renderer.service';
 import * as THREE from 'three';
 import { blinkAllStarFields, loadStarfield, updateStarfield } from '../three/loaders/starfieldLoader';
@@ -21,6 +21,7 @@ export class MindSpaceService {
   private light = new THREE.AmbientLight(0xffffff, 1.5);
   private characterControls: CharacterControls;
   private gameStateStore = inject(GameStateStore);
+  gameTimer = signal(0);
   //private cannonDebugger = CannonDebugger(this.scene, physicsWorld);
 
   constructor(private renderer: RendererService) {
@@ -31,6 +32,8 @@ export class MindSpaceService {
     this.renderer.destroy()
     stopRecursiveStarfieldBlink();
     resetGameLogic();
+    this.gameTimer.set(0);
+    this.gameStateStore.resetPlayerHP();
   }
 
   //for support me and how to play view, is just no load player
@@ -94,9 +97,14 @@ export class MindSpaceService {
     this.characterControls = new CharacterControls('mousey_breathing_idle', this.cam);
 
     this.renderer.onUpdate((dt) => {
-      this.characterControls.update(dt);
-      updateOrbitControls(getPlayerModel());
+      if (!(this.gameStateStore.gameState() === "game end")) {
+        this.gameTimer.set(this.gameTimer() + dt);
+      }
+
       updatePlayerMovement();
+      this.characterControls.update(dt, this.gameStateStore.gameState() === "game end");
+      updateOrbitControls(getPlayerModel());
+      
       updateStarfield();
 
       //honestly my genius scares me
@@ -105,7 +113,7 @@ export class MindSpaceService {
         this.gameStateStore.reducePlayerHP();
       }
       if (0 >= this.gameStateStore.playerHP()) {
-        this.gameStateStore.changeGameState("game end")
+        this.gameStateStore.changeGameState("game end");
       }
 
       physicsWorld.fixedStep();

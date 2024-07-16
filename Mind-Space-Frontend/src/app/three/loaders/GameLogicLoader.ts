@@ -3,7 +3,6 @@ import { HostileBalls } from '../utils/HostileBalls';
 import physicsWorld from '../utils/physics';
 
 let enemyArray = {};
-let gameTime = 0;
 let spawnTimer = 0;
 let spawnFrequency = 5;
 let frequencyTimer = 0;
@@ -42,7 +41,6 @@ export function updateGameLogic(dt): boolean {
     //hack work around injection
     let damage = false;
 
-    gameTime += dt;
     spawnTimer += dt;
     frequencyTimer += dt;
 
@@ -85,12 +83,7 @@ function addBallToWorld() {
 
 export function resetGameLogic() {
     enemyArray = {};
-    gameTime = 0;
     spawnTimer = 0;
     spawnFrequency = 5;
     frequencyTimer = 0;
-}
-
-export function getGameTimeForScore(){
-    return gameTime;
 }

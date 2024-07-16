@@ -2,15 +2,16 @@ import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChi
 import { MindSpaceService } from '../../services/mind-space.service';
 import { GameStateStore } from '../../ngrx-signal-store/gamestate.store';
 import { GameEndViewComponent } from "../game-end-view/game-end-view.component";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-main-page',
   standalone: true,
-  imports: [GameEndViewComponent],
+  imports: [GameEndViewComponent, CommonModule],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.css'
 })
-export class MainPageComponent implements OnInit, OnDestroy{
+export class MainPageComponent implements OnInit, OnDestroy {
   @ViewChild('rendererCanvas', { static: true })
   public rendererCanvas!: ElementRef<HTMLCanvasElement>;
 
@@ -20,9 +21,10 @@ export class MainPageComponent implements OnInit, OnDestroy{
     event.returnValue = ''; // Triggers the confirmation dialog
   }
 
+  mindSpace = inject(MindSpaceService);
   gameStateStore = inject(GameStateStore);
-  
-  constructor(private mindSpace: MindSpaceService) {}
+
+  constructor() { }
 
   ngOnDestroy(): void {
     this.mindSpace.destroy;

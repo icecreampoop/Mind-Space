@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 
@@ -10,21 +10,20 @@ export class BackendApiService {
 
   //redis
   getHighScoresOfTheDay() {
-    this.httpClient.get('/api/scores');
+    return this.httpClient.get<any[]>('/api/scores', {params: new HttpParams().set("score", "dailyscores")});
   }
 
   //sql
   getAllTimeHighScores() {
-    this.httpClient.get('/api/scores');
+    return this.httpClient.get<any[]>('/api/scores', {params: new HttpParams().set("score", "halloffame")});
   }
 
   userLoginAttempt(username: string, password: string) {
     //need handle 2 diff case, username does not exist
     //or wrong password
     //if pass both get personal high score!
-    lastValueFrom(this.httpClient.get('/api/login'))
-      .then()
-      .catch();
+    return this.httpClient.get('/api/login')
+
   }
 
   createNewAccount(username: string, password: string) {
@@ -34,14 +33,7 @@ export class BackendApiService {
       .catch();
   }
 
-  updatePersonalHighScore() {
-    lastValueFrom(this.httpClient.put('', ''))
-      .then()
-      .catch();
-    
+  updateDBHighScore(username: string ,score: number) {
+    return this.httpClient.put(`/api/${username}/update-score`, score, { responseType: 'text' })
   }
-}
-
-const accountModel = {
-    
 }

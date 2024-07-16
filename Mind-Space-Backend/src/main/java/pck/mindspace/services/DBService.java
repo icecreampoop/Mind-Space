@@ -48,10 +48,6 @@ public class DBService {
         return sortedScores;
     }
 
-    public int getDailyScoreExpiryDuration() {
-        return redisRepo.getExpiryDuration();
-    }
-
     public void updateHighScore(String username, double submittedScore) {
         redisRepo.updateHighScore(username, submittedScore);
         sqlRepo.updatePersonalHighScore(username, submittedScore);
@@ -68,5 +64,11 @@ public class DBService {
     public String createAccount(String username, String password){
 
         return "";
+    }
+
+    //TODO SQL all time high score/hall of fame
+    public LinkedList<String[]> getHallOfFame() {
+        
+        return new LinkedList<String[]>();
     }
 }

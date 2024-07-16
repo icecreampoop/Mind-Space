@@ -9,24 +9,29 @@ import { BackendApiService } from '../../services/backend-api.service';
   templateUrl: './login-view.component.html',
   styleUrl: './login-view.component.css'
 })
-export class LoginViewComponent implements OnDestroy, OnInit {
+export class LoginViewComponent implements OnInit {
   gameStateStore = inject(GameStateStore);
   private backendService = inject(BackendApiService);
-  highScoreOfTheDay$: any;
+  highScoreOfTheDay$: any[];
   allTimeHighScore$: any;
 
   ngOnInit(): void {
-    //sub to backend api observable to show high score of the day/all-time
-    this.allTimeHighScore$ = this.backendService.getAllTimeHighScores();
-    this.highScoreOfTheDay$ = this.backendService.getHighScoresOfTheDay();
+    //sub to backend api observable to show high score of the day/all-time, auto unsubs cus its http
+    //this.allTimeHighScore$ = this.backendService.getAllTimeHighScores().subscribe();
+    this.backendService.getHighScoresOfTheDay().subscribe({
+      next: (data) => this.highScoreOfTheDay$ = data,
+      error: (error) => console.log(error)
+    });
   }
 
-  ngOnDestroy(): void {
-    //unsub from observable
-  }
+
 
   backToLanding() {
     this.gameStateStore.changeGameState("landing page");
+  }
+
+  play(){
+    
   }
 
   login() {

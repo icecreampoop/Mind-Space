@@ -69,7 +69,7 @@ export function loadPlayer(scene: Scene) {
     //punch hit box
     punchPhysicsHitBox = new CANNON.Body({
         mass: 10,
-        shape: new CANNON.Box(new CANNON.Vec3(1.3, 2, 1.5)),
+        shape: new CANNON.Box(new CANNON.Vec3(1.3, 2, 1.1)),
         position: new CANNON.Vec3(0, 3, -2),
         type: CANNON.Body.KINEMATIC,
         collisionResponse: false

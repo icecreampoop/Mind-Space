@@ -73,11 +73,13 @@ export class CharacterControls {
         })
     }
 
-    public update(delta: number) {
+    public update(delta: number, gameEnd: boolean) {
         const directionPressed = this.DIRECTIONS.some(key => this.keysPressed[key] == true)
         this.forwardOffset = new THREE.Vector3(0, 3, 2);
 
-        if (directionPressed) {
+        if (gameEnd) {
+            this.play = 'mousey_breathing_idle'
+        } else if (directionPressed) {
             this.play = 'mousey_run'
         } else if (this.keysPressed[" "] && !this.punchStateLock) {
             //cannot really alternate and no time alr bru
@@ -186,7 +188,7 @@ export class CharacterControls {
         }
 
         //movement + camera logic
-        if (this.animationsMap.get('mousey_dash')) {
+        if (this.animationsMap.get('mousey_dash')) {     // <-this ('mousey_dash').isRunning() was throwing error as map not loaded
             if (this.currentAction == 'mousey_run' || this.animationsMap.get('mousey_dash').isRunning()) {
                 // calculate towards camera direction
                 // took me so long to fix the mesh direction bruh

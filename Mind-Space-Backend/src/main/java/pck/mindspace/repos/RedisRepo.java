@@ -34,17 +34,12 @@ public class RedisRepo {
             for (var tuple : template.opsForZSet().rangeWithScores(redisKey, 0,
                     template.opsForZSet().zCard(redisKey) - 1)) {
 
-                temp.push(new String[]{tuple.getValue(), tuple.getScore().toString()});
+                temp.add(new String[]{tuple.getValue(), tuple.getScore().toString()});
             }
         }
-
+        
         // sorted in service
         return temp;
-    }
-
-    public int getExpiryDuration() {
-        expiryDuration = 86400 - LocalTime.now(sgZone).toSecondOfDay();
-        return expiryDuration;
     }
 
     // update highscore
@@ -55,6 +50,8 @@ public class RedisRepo {
 
         } else {
             // if higher than 10th pop lowest score and insert, once again 0, 0 cus inclusive range
+            //abit stupid to for loop 1 element but the set type i found isZSetOperations.TypedTuple<V>
+            //BUT I CANT FIND WHATS THE TYPE OF <V>
             for (var tuple : template.opsForZSet().rangeWithScores(redisKey, 0, 0)){
                 if (submittedScore > tuple.getScore()) {
                     template.opsForZSet().popMin(redisKey);

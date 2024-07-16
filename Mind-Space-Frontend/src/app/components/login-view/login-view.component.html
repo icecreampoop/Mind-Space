@@ -1,24 +1,17 @@
-@if ("highScoreOfTheDay$ | async") {
-    <p>Loaded</p>
-@for (score of highScoreOfTheDay$; track $index) {
-    
-}
-} @else {
-    <p>Loading...</p>
-}
+<div class="bg-primary opacity-25"></div>
+<ul>
+    @for (score of highScoreOfTheDay$; track $index) {
+    <ol class="text-light">
+        name: {{score.name.string}}
+    </ol>
+    <ol class="text-warning">
+        score: {{score.score.string}}
+    </ol>
+    }
+</ul>
 
-@if ("allTimeHighScore$ | async") {
-    <p>Loaded</p>
-@for (score of allTimeHighScore$; track $index) {
-    
-}
-} @else {
-    <p>Loading...</p>
-}
-
-<!-- if havent log in state show login/create acc buttons -->
 <div class="container">
-    <div class="row mt-5 pt-5">
+    <div class="row">
         <div class="col mt-5">
             <div class="col-sm-2 col-lg-1 col-xl-1 d-grid text-end">
                 <button class="btn btn-outline-light btn-lg mb-3" (click)="backToLanding()">Back</button>
@@ -27,16 +20,21 @@
     </div>
 </div>
 
-<div class="container">
-    <div class="row justify-content-center">
-
-        <button class="btn btn-outline-light btn-lg mb-3" (click)="createAccount()">Make New Account</button>
-
-
-        <button class="btn btn-outline-light btn-lg mb-3" (click)="login()">Login</button>
-
+@if (gameStateStore.loggedIn() === false) {
+    <div class="container">
+        <div class="row justify-content-center">
+    
+            <button class="btn btn-outline-light btn-lg mb-3" (click)="createAccount()">Make New Account</button>
+    
+    
+            <button class="btn btn-outline-light btn-lg mb-3" (click)="login()">Login</button>
+    
+        </div>
     </div>
-</div>
-
-<!-- if logged in state === true show only high scores of the day/high score all time/personal high score
-and play button -->
+} @else {
+    <div class="container">
+        <div class="row justify-content-center">
+            <button class="btn btn-danger btn-lg mb-3 opacity-75" (click)="play()">PLAY</button>
+        </div>
+    </div>
+}

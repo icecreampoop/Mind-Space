@@ -1,4 +1,6 @@
+import { inject } from "@angular/core";
 import { patchState, signalStore, withMethods, withState } from "@ngrx/signals";
+import { BackendApiService } from "../services/backend-api.service";
 
 type GameState = {
     gameState: 'landing page' | 'logging in' | 'gaming' | 'game end';
@@ -24,11 +26,10 @@ export const GameStateStore = signalStore(
     {providedIn: 'root'},
     withState(initialGameState),
     withMethods(
-        //can inject services to use within the map/dict also! 
-        //(_store, gameStateSvc = inject(GameStateService)) instead of just (_store)
+        //can inject services to use within the map/dict also!
         //_store refers to the state being managed, can name it anyth really
         //iirc _ means internal variable right as naming convention
-        (_store) => ({
+        (_store, backendSvc = inject(BackendApiService)) => ({
 
             //a map/dict of methods to use on the store
             changeGameState(nextGameState: GameState['gameState']) {
@@ -52,7 +53,7 @@ export const GameStateStore = signalStore(
             },
 
             //call backend api, if backend say ok, save the username n pw to the state
-            setUsernamePW(username: string, password: string) {
+            async setUsernamePW(username: string, password: string) {
                 patchState(_store, {username: username, password: password})
             },
 
@@ -61,14 +62,22 @@ export const GameStateStore = signalStore(
                 patchState(_store, initialGameState)
             },
 
+            //any backend calls should be async right?
+            async setAndUpdateHighScore(score: number) {
+                let temp = "Try Harder Noob";
 
-            async setHighScore(score: number) {
                 if (score > _store.userHighScore()){
-                    patchState(_store, {userHighScore: score})
+                    patchState(_store, {userHighScore: score});
+
+                    //ping backend update score db
+                    backendSvc.updateDBHighScore(_store.username(), score).subscribe(
+                        (response) => temp = response
+                    );
+
+                    return temp;
                 }
 
-                //call backend
-                
+                return temp;
             }
         })
     )

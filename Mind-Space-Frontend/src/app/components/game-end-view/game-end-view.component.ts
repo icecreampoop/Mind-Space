@@ -1,20 +1,17 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { MindSpaceService } from '../../services/mind-space.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-game-end-view',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './game-end-view.component.html',
   styleUrl: './game-end-view.component.css'
 })
-export class GameEndViewComponent implements OnDestroy, OnInit{
-
-  ngOnDestroy(): void {
-    //unsub from observable
-    
-  }
+export class GameEndViewComponent implements OnInit{
+  mindSpaceSvc = inject(MindSpaceService);
 
   ngOnInit(): void {
-    //sub to backend api observable
   }
 }
