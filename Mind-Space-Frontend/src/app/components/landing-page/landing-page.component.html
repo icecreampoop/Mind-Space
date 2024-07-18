@@ -1,0 +1,65 @@
+<canvas #rendererCanvas id="rendererCanvas"></canvas>
+
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+@if (gameStateStore.gameState() === "landing page" && gameStateStore.loggedIn() === false) {
+  <div class="container">
+    <div class="row mt-5 pt-5">
+      <div class="col mt-5 pt-5">
+        <h1 class="space-font text-center display-1 text-light mt-3 mb-5">Mind Space</h1>
+      </div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-end">
+        <button class="btn btn-outline-light btn-lg mb-3" (click)="playAsGuest()">Play as Guest</button>
+      </div>
+      <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-start">
+        <button class="btn btn-outline-light btn-lg mb-3" (click)="loginView()">Log In</button>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-end">
+        <a routerLink="/how-to-play" class="btn btn-outline-light btn-lg mb-3">How To Play</a>
+      </div>
+      <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-start">
+        <a routerLink="/support-me" class="btn btn-outline-light btn-lg mb-3">Support Me</a>
+      </div>
+    </div>
+  </div>
+}
+
+@if (gameStateStore.gameState() === "landing page" && gameStateStore.loggedIn() === true) {
+  <div class="container">
+    <div class="row mt-5 pt-5">
+      <div class="col mt-5 pt-5">
+        <h1 class="space-font text-center display-1 text-light mt-3 mb-5">Mind Space</h1>
+      </div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-end">
+        <button class="btn btn-outline-light btn-lg mb-3" (click)="logOut()">Log Out</button>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-end">
+        <a routerLink="/how-to-play" class="btn btn-outline-light btn-lg mb-3">How To Play</a>
+      </div>
+      <div class="col-sm-4 col-lg-3 col-xl-2 d-grid text-start">
+        <a routerLink="/support-me" class="btn btn-outline-light btn-lg mb-3">Support Me</a>
+      </div>
+    </div>
+  </div>
+}
+
+@if (gameStateStore.gameState() === "logging in") {
+  <app-login-view></app-login-view>
+}
+

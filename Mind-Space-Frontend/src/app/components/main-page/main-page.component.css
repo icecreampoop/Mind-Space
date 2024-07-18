@@ -1,0 +1,9 @@
+#rendererCanvas {
+    /* idw to learn dom tree structure and positions lol, at least not yet cus no time */
+    position: fixed;
+    /* thought i didnt need to set top and left but i was wrong, theres a white gap */
+    top: 0;
+    left: 0;
+    /* Ensure the canvas is behind other elements */
+    z-index: -1; 
+}
