@@ -10,6 +10,7 @@ type GameState = {
     username: string;
     password: string;
     userHighScore: number;
+    gameEndState: null | 'Not Your Best Run, Try Again?' | 'Personal High Score Updated' | 'Daily Rank Updated' | 'Hall Of Fame Updated'
 }
 
 const initialGameState: GameState = {
@@ -19,7 +20,8 @@ const initialGameState: GameState = {
     spinner: false,
     username: '',
     password: '',
-    userHighScore: 0
+    userHighScore: 0,
+    gameEndState: null
 }
 
 export const GameStateStore = signalStore(
@@ -52,9 +54,9 @@ export const GameStateStore = signalStore(
                 patchState(_store, {playerHP: 2})
             },
 
-            //call backend api, if backend say ok, save the username n pw to the state
-            async setUsernamePW(username: string, password: string) {
-                patchState(_store, {username: username, password: password})
+            //call backend api, if backend say ok, save the username/pw/score to the state
+            setUserStateAfterLogin(username: string, password: string, score: number) {
+                patchState(_store, {username: username, password: password, userHighScore: score})
             },
 
             //when logged out just reset to nth and go to landing page
@@ -62,22 +64,28 @@ export const GameStateStore = signalStore(
                 patchState(_store, initialGameState)
             },
 
-            //any backend calls should be async right?
-            async setAndUpdateHighScore(score: number) {
-                let temp = "Try Harder Noob";
-
+            //game end logic, idk man feels weird to do logic in store but idk whats market practise also
+            gameEndLogic(score: number){
                 if (score > _store.userHighScore()){
                     patchState(_store, {userHighScore: score});
+                    patchState(_store, {gameEndState: 'Personal High Score Updated'});
 
                     //ping backend update score db
-                    backendSvc.updateDBHighScore(_store.username(), score).subscribe(
-                        (response) => temp = response
+                    backendSvc.updateDBHighScore(_store.username(), score).subscribe({
+                        next: (response) => {
+                            if (response == 'Daily Rank Updated'){
+                                patchState(_store, {gameEndState: 'Daily Rank Updated'});
+                            } else if (response == 'Hall Of Fame Updated'){
+                                patchState(_store, {gameEndState: 'Hall Of Fame Updated'});
+                            }
+                            
+                        },
+                        error: (error) => console.log(error)
+                    }
                     );
-
-                    return temp;
+                } else {
+                    patchState(_store, {gameEndState: 'Not Your Best Run, Try Again?'});
                 }
-
-                return temp;
             }
         })
     )

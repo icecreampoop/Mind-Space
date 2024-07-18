@@ -1,10 +1,11 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MindSpaceService } from '../../services/mind-space.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-support-me',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './support-me.component.html',
   styleUrl: './support-me.component.css'
 })
@@ -21,4 +22,5 @@ export class SupportMeComponent {
   public ngOnInit(): void {
     this.mindSpace.landingPage(this.rendererCanvas);
   }
+
 }

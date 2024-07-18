@@ -34,7 +34,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   playAsGuest() {
     this.gameStateStore.changeGameState("gaming");
-    this.router.navigate(['/main'])
+    this.router.navigate(['/main']);
   }
 
   logOut() {

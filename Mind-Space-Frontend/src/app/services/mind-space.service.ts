@@ -114,6 +114,7 @@ export class MindSpaceService {
       }
       if (0 >= this.gameStateStore.playerHP()) {
         this.gameStateStore.changeGameState("game end");
+        this.gameStateStore.gameEndLogic(Math.round(this.gameTimer() * 100));
       }
 
       physicsWorld.fixedStep();

@@ -30,39 +30,51 @@ public class RedisRepo {
         LinkedList<String[]> temp = new LinkedList<>();
         // just wanna say ive been doing niche stuff that chatgpt cant help for bru
         if (template.opsForZSet().zCard(redisKey) > 0) {
-            //incase need to debug, rangeWithScores is inclusive range
+            // incase need to debug, rangeWithScores is inclusive range
             for (var tuple : template.opsForZSet().rangeWithScores(redisKey, 0,
                     template.opsForZSet().zCard(redisKey) - 1)) {
 
-                temp.add(new String[]{tuple.getValue(), tuple.getScore().toString()});
+                temp.add(new String[] { tuple.getValue(), tuple.getScore().toString() });
             }
         }
-        
-        // sorted in service
+
+        // sorted in service, i triple checked, range returns a set??
+        // whats the point of zset other than for pinging lowest/highest indiv items
         return temp;
     }
 
     // update highscore
-    public void updateHighScore(String username, double submittedScore) {
+    public boolean updateHighScore(String username, double submittedScore) {
+
         // if not full add straight
         if (10 > template.opsForZSet().zCard(redisKey)) {
             template.opsForZSet().add(redisKey, username, submittedScore);
 
+            // set expire time based on singapore time to 0000
+            expiryDuration = 86400 - LocalTime.now(sgZone).toSecondOfDay();
+            template.expire(redisKey, expiryDuration, TimeUnit.SECONDS);
+            return true;
+
         } else {
-            // if higher than 10th pop lowest score and insert, once again 0, 0 cus inclusive range
-            //abit stupid to for loop 1 element but the set type i found isZSetOperations.TypedTuple<V>
-            //BUT I CANT FIND WHATS THE TYPE OF <V>
-            for (var tuple : template.opsForZSet().rangeWithScores(redisKey, 0, 0)){
+            // if higher than 10th pop lowest score and insert, once again 0, 0 cus
+            // inclusive range
+            // abit stupid to for loop 1 element but the set type i found
+            // isZSetOperations.TypedTuple<V>
+            // BUT I CANT FIND WHATS THE TYPE OF <V>
+            for (var tuple : template.opsForZSet().rangeWithScores(redisKey, 0, 0)) {
                 if (submittedScore > tuple.getScore()) {
                     template.opsForZSet().popMin(redisKey);
                     template.opsForZSet().add(redisKey, username, submittedScore);
+
+                    // set expire time based on singapore time to 0000
+                    expiryDuration = 86400 - LocalTime.now(sgZone).toSecondOfDay();
+                    template.expire(redisKey, expiryDuration, TimeUnit.SECONDS);
+                    return true;
                 }
             }
-            
-        }
 
-        // set expire time based on singapore time to 0000
-        expiryDuration = 86400 - LocalTime.now(sgZone).toSecondOfDay();
-        template.expire(redisKey, expiryDuration, TimeUnit.SECONDS);
+        }
+        // nth was added so no need expire
+        return false;
     }
 }

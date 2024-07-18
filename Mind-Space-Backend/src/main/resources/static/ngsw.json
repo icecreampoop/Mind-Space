@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1721165699218,
+  "timestamp": 1721265606162,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/favicon.ico",
         "/index.html",
-        "/main-UMVJD6N6.js",
+        "/main-25C7464I.js",
         "/manifest.webmanifest",
         "/polyfills-6EAL64PA.js",
         "/scripts-EEEIPNC3.js",
@@ -68,8 +68,8 @@
     "/assets/mousey_zombie_death.fbx": "ca78ea543a555ea57cbc610f3e1fac2dee824502",
     "/assets/star.png": "623e60fbac0c25acae59e0a45abf157d9918d69b",
     "/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
-    "/index.html": "bdd98650bb25eb9e79d6d85da9333e1bcb6f66d3",
-    "/main-UMVJD6N6.js": "436d497ddc214261fe293f292050b0802f578852",
+    "/index.html": "2ff0640f988fa3910f0a74ad2452f6de5dc6ddb3",
+    "/main-25C7464I.js": "128945b2fd033dc19cc7090b8b8d5879e6503fbf",
     "/manifest.webmanifest": "d88f9368e09c6a3f7cb6857e505c4dc969a9f9b6",
     "/polyfills-6EAL64PA.js": "d874147a12a6570d9b44e99935e9de8b7f3cabbc",
     "/scripts-EEEIPNC3.js": "2318ded8c885787a1645385a82c1ca883c359034",

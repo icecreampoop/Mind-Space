@@ -22,7 +22,7 @@ export class BackendApiService {
     //need handle 2 diff case, username does not exist
     //or wrong password
     //if pass both get personal high score!
-    return this.httpClient.get('/api/login')
+    return this.httpClient.post('/api/login', {username: username, password: password}, {responseType: 'text'});
 
   }
 
@@ -34,6 +34,6 @@ export class BackendApiService {
   }
 
   updateDBHighScore(username: string ,score: number) {
-    return this.httpClient.put(`/api/${username}/update-score`, score, { responseType: 'text' })
+    return this.httpClient.put(`/api/${username}/update-score`, score.toString(), { responseType: 'text' });
   }
 }

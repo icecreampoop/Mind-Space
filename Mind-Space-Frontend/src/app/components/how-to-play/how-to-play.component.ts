@@ -1,11 +1,11 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MindSpaceService } from '../../services/mind-space.service';
 
 @Component({
   selector: 'app-how-to-play',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './how-to-play.component.html',
   styleUrl: './how-to-play.component.css'
 })
