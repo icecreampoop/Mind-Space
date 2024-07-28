@@ -26,6 +26,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.mindSpace.landingPage(this.rendererCanvas);
+    this.gameStateStore.changeGameState("landing page");
   }
 
   loginView() {

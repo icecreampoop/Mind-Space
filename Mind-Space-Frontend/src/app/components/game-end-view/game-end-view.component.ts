@@ -20,7 +20,6 @@ export class GameEndViewComponent implements OnInit {
   }
 
   backToLanding() {
-    this.gameStateStore.changeGameState("landing page");
     this.router.navigate(['/']);
   }
 }
