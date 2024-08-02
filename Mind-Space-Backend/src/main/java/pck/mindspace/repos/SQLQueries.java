@@ -31,8 +31,8 @@ public class SQLQueries {
                         SELECT COUNT(*) as count FROM username_password WHERE username = ?;
                         """;
 
-        // TODO transactional update hall of fame score/personal score (if higher)
-        // TODO check if hall of fame size <5 first
+        // The AS subquery is required because MySQL (and other SQL databases) needs to treat the result of the inner subquery 
+        // as a temporary table from which the outer query can select
         public static final String DELETE_LOWEST_HALL_OF_FAME = """
                         DELETE FROM hall_of_fame WHERE score_id = (
                             SELECT min_score_id FROM (
@@ -41,11 +41,10 @@ public class SQLQueries {
                                 WHERE username = ?
                                 ORDER BY score ASC
                                 LIMIT 1
-                            )
+                            ) AS subquery
                         );
                         """;
 
-        // TODO dont forget to call GET_USER_INFO to compare score first
         public static final String UPDATE_PERSONAL_SCORE = """
                         UPDATE personal_score SET score = ? WHERE username = ?;
                         """;

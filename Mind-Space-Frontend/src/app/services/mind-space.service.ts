@@ -116,7 +116,11 @@ export class MindSpaceService {
       }
       if (0 >= this.gameStateStore.playerHP() && gameEndLogicSwitch) {
         this.gameStateStore.changeGameState("game end");
-        this.gameStateStore.gameEndLogic(Math.round(this.gameTimer() * 100));
+
+        if (this.gameStateStore.loggedIn() === true) {
+          this.gameStateStore.gameEndLogic(Math.round(this.gameTimer() * 100));
+        }
+        
         gameEndLogicSwitch = false;
       }
 

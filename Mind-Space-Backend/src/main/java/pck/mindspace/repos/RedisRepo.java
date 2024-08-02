@@ -45,6 +45,20 @@ public class RedisRepo {
 
     // update highscore
     public boolean updateHighScore(String username, double submittedScore) {
+        // check if the user already has his own daily rank record 
+        // for redis each user can only have 1 daily rank score placing, in contrast to the hall of fame
+        Double tempScore = template.opsForZSet().score(redisKey, username);
+        if (tempScore != null){
+            if (submittedScore > tempScore){
+                template.opsForZSet().add(redisKey, username, submittedScore);
+
+                // set expire time based on singapore time to 0000
+                expiryDuration = 86400 - LocalTime.now(sgZone).toSecondOfDay();
+                template.expire(redisKey, expiryDuration, TimeUnit.SECONDS);
+                return true;
+                
+            } else return false;
+        }
 
         // if not full add straight
         if (5 > template.opsForZSet().zCard(redisKey)) {

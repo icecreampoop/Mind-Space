@@ -13,9 +13,6 @@ public class SQLRepo {
     @Autowired
     private JdbcTemplate template;
 
-    // TODO DO NOT EXPOSE IN GITHUB application properties revert back to env keys
-    // instead of hardcode
-
     // update personal high score
     public boolean updatePersonalHighScore(String username, double submittedScore) {
         final SqlRowSet rs = template.queryForRowSet(SQLQueries.GET_USER_INFO, username);
