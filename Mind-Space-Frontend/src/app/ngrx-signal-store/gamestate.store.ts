@@ -25,7 +25,7 @@ const initialGameState: GameState = {
 }
 
 export const GameStateStore = signalStore(
-    {providedIn: 'root'},
+    { providedIn: 'root' },
     withState(initialGameState),
     withMethods(
         //can inject services to use within the map/dict also!
@@ -35,28 +35,28 @@ export const GameStateStore = signalStore(
 
             //a map/dict of methods to use on the store
             changeGameState(nextGameState: GameState['gameState']) {
-                patchState(_store, {gameState: nextGameState})
+                patchState(_store, { gameState: nextGameState })
             },
 
             changeSpinnerState() {
-                patchState(_store, {spinner: !_store.spinner()})
+                patchState(_store, { spinner: !_store.spinner() })
             },
 
             changeLogInState() {
-                patchState(_store, {loggedIn: !_store.loggedIn()})    
+                patchState(_store, { loggedIn: !_store.loggedIn() })
             },
 
             reducePlayerHP() {
-                patchState(_store, {playerHP: _store.playerHP()-1})
+                patchState(_store, { playerHP: _store.playerHP() - 1 })
             },
 
             resetPlayerHP() {
-                patchState(_store, {playerHP: 2})
+                patchState(_store, { playerHP: 2 })
             },
 
             //call backend api, if backend say ok, save the username/pw/score to the state
             setUserStateAfterLogin(username: string, password: string, score: number) {
-                patchState(_store, {username: username, password: password, userHighScore: score})
+                patchState(_store, { username: username, password: password, userHighScore: score })
             },
 
             //when logged out just reset to nth and go to landing page
@@ -65,26 +65,33 @@ export const GameStateStore = signalStore(
             },
 
             //game end logic, idk man feels weird to do logic in store but idk whats market practise also
-            gameEndLogic(score: number){
-                if (score > _store.userHighScore()){
-                    patchState(_store, {userHighScore: score});
-                    patchState(_store, {gameEndState: 'Personal High Score Updated'});
+            gameEndLogic(score: number) {
+                let scoreUpdated: boolean = false;
 
-                    //ping backend update score db
-                    backendSvc.updateDBHighScore(_store.username(), score).subscribe({
-                        next: (response) => {
-                            if (response == 'Daily Rank Updated'){
-                                patchState(_store, {gameEndState: 'Daily Rank Updated'});
-                            } else if (response == 'Hall Of Fame Updated'){
-                                patchState(_store, {gameEndState: 'Hall Of Fame Updated'});
-                            }
-                            
-                        },
-                        error: (error) => console.log(error)
-                    }
-                    );
-                } else {
-                    patchState(_store, {gameEndState: 'Not Your Best Run, Try Again?'});
+                if (score > _store.userHighScore()) {
+                    patchState(_store, { userHighScore: score });
+                    patchState(_store, { gameEndState: 'Personal High Score Updated' });
+                    scoreUpdated = true;
+                }
+                
+                //ping backend update score db
+                backendSvc.updateDBHighScore(_store.username(), score).subscribe({
+                    next: (response) => {
+                        if (response == 'Daily Rank Updated') {
+                            patchState(_store, { gameEndState: 'Daily Rank Updated' });
+                            scoreUpdated = true;
+                        } else if (response == 'Hall Of Fame Updated') {
+                            patchState(_store, { gameEndState: 'Hall Of Fame Updated' });
+                            scoreUpdated = true;
+                        }
+
+                    },
+                    error: (error) => console.log(error)
+                }
+                );
+
+                if (!scoreUpdated) {
+                    patchState(_store, { gameEndState: 'Not Your Best Run, Try Again?' });
                 }
             }
         })

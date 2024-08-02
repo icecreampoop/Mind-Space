@@ -63,7 +63,7 @@ public class DBService {
 
     public int loginCheck(String username, String password) {
 
-        // if username does not exist
+        // if username does not exist   (i could just return 1 string n split it to reduce db calls....i could)
         if (!sqlRepo.doesUsernameExist(username)) {
             return 0;
         } else if (!sqlRepo.getUserPassword(username).equals(password)) {

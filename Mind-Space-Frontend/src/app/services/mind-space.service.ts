@@ -83,6 +83,8 @@ export class MindSpaceService {
   }
 
   mainPage(canvas: ElementRef<HTMLCanvasElement>) {
+    let gameEndLogicSwitch: boolean = true;
+
     this.destroy();
 
     blinkAllStarFields();
@@ -109,12 +111,13 @@ export class MindSpaceService {
 
       //honestly my genius scares me
       const damageTaken = updateGameLogic(dt);
-      if (damageTaken) {
+      if (damageTaken && gameEndLogicSwitch) {
         this.gameStateStore.reducePlayerHP();
       }
-      if (0 >= this.gameStateStore.playerHP()) {
+      if (0 >= this.gameStateStore.playerHP() && gameEndLogicSwitch) {
         this.gameStateStore.changeGameState("game end");
         this.gameStateStore.gameEndLogic(Math.round(this.gameTimer() * 100));
+        gameEndLogicSwitch = false;
       }
 
       physicsWorld.fixedStep();
