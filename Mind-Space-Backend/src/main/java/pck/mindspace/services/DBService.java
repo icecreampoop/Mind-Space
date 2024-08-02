@@ -32,17 +32,20 @@ public class DBService {
         Collections.sort(sortList, Collections.reverseOrder());
 
         while (temp.size() > 0) {
-            int tempIndex = 0;
+            String tempUsername = "";
+            int tempScore = 0;
 
             // find index of the highest string score in temp
             for (int x = 0; x < temp.size(); x++) {
                 if (Double.parseDouble(temp.get(x)[1]) == sortList.getFirst()) {
-                    tempIndex = x;
+                    tempScore = (int)Double.parseDouble(temp.get(x)[1]);
+                    tempUsername = temp.get(x)[0];
+                    temp.remove(x);
                     break;
                 }
             }
 
-            sortedScores.add(temp.remove(tempIndex));
+            sortedScores.add(new String[]{tempUsername, String.valueOf(tempScore)});
             sortList.removeFirst();
         }
 
