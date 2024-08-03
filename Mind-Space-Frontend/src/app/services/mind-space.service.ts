@@ -1,4 +1,4 @@
-import { ElementRef, inject, Injectable, signal } from '@angular/core';
+import { ElementRef, inject, Injectable } from '@angular/core';
 import { RendererService } from '../three/game-engine/renderer.service';
 import * as THREE from 'three';
 import { blinkAllStarFields, loadStarfield, updateStarfield } from '../three/loaders/starfieldLoader';
@@ -11,6 +11,7 @@ import physicsWorld, { cleanUpPhysics } from '../three/utils/physics';
 import { CharacterControls } from '../three/utils/CharacterControls';
 import { loadGameLogic, resetGameLogic, updateGameLogic } from '../three/loaders/GameLogicLoader';
 import { GameStateStore } from '../ngrx-signal-store/gamestate.store';
+import { Timer } from 'three/examples/jsm/misc/Timer.js';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class MindSpaceService {
   private light = new THREE.AmbientLight(0xffffff, 1.5);
   private characterControls: CharacterControls;
   private gameStateStore = inject(GameStateStore);
-  gameTimer = signal(0);
+  public gameTimer: Timer;
   //private cannonDebugger = CannonDebugger(this.scene, physicsWorld);
 
   constructor(private renderer: RendererService) {
@@ -32,7 +33,6 @@ export class MindSpaceService {
     this.renderer.destroy()
     stopRecursiveStarfieldBlink();
     resetGameLogic();
-    this.gameTimer.set(0);
     this.gameStateStore.resetPlayerHP();
   }
 
@@ -97,10 +97,11 @@ export class MindSpaceService {
     this.renderer.animate();
 
     this.characterControls = new CharacterControls('mousey_breathing_idle', this.cam);
+    this.gameTimer  = new Timer();
 
     this.renderer.onUpdate((dt) => {
       if (!(this.gameStateStore.gameState() === "game end")) {
-        this.gameTimer.set(this.gameTimer() + dt);
+        this.gameTimer.update();
       }
 
       updatePlayerMovement();
@@ -118,10 +119,11 @@ export class MindSpaceService {
         this.gameStateStore.changeGameState("game end");
 
         if (this.gameStateStore.loggedIn() === true) {
-          this.gameStateStore.gameEndLogic(Math.round(this.gameTimer() * 100));
+          this.gameStateStore.gameEndLogic(Math.round(this.gameTimer.getElapsed() * 100));
         }
         
         gameEndLogicSwitch = false;
+        this.gameTimer.dispose();
       }
 
       physicsWorld.fixedStep();
