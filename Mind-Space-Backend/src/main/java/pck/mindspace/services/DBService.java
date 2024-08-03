@@ -77,14 +77,16 @@ public class DBService {
         return 2;
     }
 
+    public boolean getUsernameAvailability(String username) {
+        return !sqlRepo.doesUsernameExist(username);
+    }
+
     public String getUserPersonalHighScore(String username) {
         return sqlRepo.getPersonalHighScore(username);
     }
 
-    // TODO sql create account
-    public String createAccount(String username, String password) {
-
-        return "";
+    public void createAccount(String username, String password) {
+        sqlRepo.createNewUser(username, password);
     }
 
     public LinkedList<String[]> getHallOfFame() {

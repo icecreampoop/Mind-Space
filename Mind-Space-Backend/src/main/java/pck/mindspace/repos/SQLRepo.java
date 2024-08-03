@@ -89,4 +89,9 @@ public class SQLRepo {
 
         return temp;
     }
+
+    public void createNewUser(String username, String password){
+        template.update(SQLQueries.INSERT_NEW_USERPW, username, password);
+        template.update(SQLQueries.INSERT_NEW_USER_SCORE, username, 0);
+    }
 }

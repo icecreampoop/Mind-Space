@@ -18,7 +18,6 @@ public class SQLQueries {
                         WHERE up.username = ?;
                         """;
 
-        // TODO create account transactional (check name avail, if = 0, before insert)
         public static final String INSERT_NEW_USERPW = """
                         INSERT INTO username_password values (?, ?);
                         """;

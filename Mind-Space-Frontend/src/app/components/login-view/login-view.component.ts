@@ -73,8 +73,17 @@ export class LoginViewComponent implements OnInit {
   }
 
   createAccount() {
+    this.errorBoolean = false;
     //backend check if username already taken
-    //TRIM BEFORE SENDING OVER THE INPUTS
-    this.backendService.createNewAccount(this.userForm.value.username,this.userForm.value.password);
+    this.backendService.createNewAccount(this.userForm.value.username,this.userForm.value.password).subscribe({
+      next: () => {
+        this.gameStateStore.changeLogInState();
+        this.gameStateStore.setUserStateAfterLogin(this.userForm.value.username, this.userForm.value.password, 0);
+      },
+      error: (error) => {
+        this.errorBoolean = true;
+        this.errorMsg = error.error;
+      }
+    });
   }
 }
