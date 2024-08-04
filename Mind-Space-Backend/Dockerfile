@@ -9,8 +9,6 @@ COPY mvnw .
 COPY pom.xml .
 COPY .mvn .mvn
 COPY src src
-COPY src/main/resources/static/assets/ *.fbx
-
 
 # target/weather-0.0.1-SNAPSHOT.jar
 RUN chmod a+x /app/mvnw

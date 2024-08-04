@@ -17,6 +17,10 @@ export class CharacterControls {
     private punchQuaternion: THREE.QuaternionLike;
     private punchStateLock = false;
 
+    // audio
+    private bonkSound: THREE.Audio;
+    private dashSound: THREE.Audio;
+
     // temporary data
     private walkDirection = new THREE.Vector3()
     private rotateAngle = new THREE.Vector3(0, 1, 0)
@@ -38,7 +42,7 @@ export class CharacterControls {
     private fadeDuration: number = 0.2
     private forwardOffset: THREE.Vector3;
 
-    constructor(currentAction: string, camera: THREE.PerspectiveCamera) {
+    constructor(currentAction: string, camera: THREE.PerspectiveCamera, listener: THREE.AudioListener, audioLoader: THREE.AudioLoader) {
         this.model = getPlayerModel();
         this.init();
         this.currentAction = currentAction
@@ -56,6 +60,23 @@ export class CharacterControls {
             }
         }, false);
 
+        //setup audio
+        this.bonkSound = new THREE.Audio(listener);
+        audioLoader.load('bonk-sound-effect.mp3', (buffer) => {
+            this.bonkSound.setBuffer(buffer);
+            this.bonkSound.setLoop(false);
+            this.bonkSound.offset = 0.2;
+            this.bonkSound.duration = 1;
+            this.bonkSound.setVolume(0.3);
+        });
+        this.dashSound = new THREE.Audio(listener);
+        audioLoader.load('fart_echo.mp3', (buffer) => {
+            this.dashSound.setBuffer(buffer);
+            this.dashSound.setLoop(false);
+            this.dashSound.offset = 0.1;
+            this.dashSound.playbackRate = 1.3;
+            this.dashSound.setVolume(0.2);
+        });
     }
 
     private async init() {
@@ -148,20 +169,26 @@ export class CharacterControls {
                     //logic for punch
                     if (this.play == 'mousey_punch1') {
                         current.fadeOut(this.fadeDuration).reset().stop();
-                        //logic for hit detection
-                        getPunchHitBox().velocity.set(0, 0, 0);
-                        //this controls power of the punch
-                        this.forwardOffset = new THREE.Vector3(0, 300, 200);
-                        getPunchHitBox().collisionResponse = true;
-                        this.punchQuaternion = getPlayerModel().quaternion;
-                        getPunchHitBox().quaternion.set(this.punchQuaternion.x, this.punchQuaternion.y, this.punchQuaternion.z, this.punchQuaternion.w);
-                        this.forwardOffset.applyQuaternion(this.punchQuaternion)
-                        this.forwardOffset.add(getPlayerModel().position)
-                        getPunchHitBox().velocity.set(this.forwardOffset.x, 0, this.forwardOffset.z)
+
+                        //small delay for hit logic to match animation
+                        setTimeout(() => {
+                            //logic for hit detection
+                            getPunchHitBox().velocity.set(0, 0, 0);
+                            //this controls power of the punch
+                            this.forwardOffset = new THREE.Vector3(0, 300, 200);
+                            getPunchHitBox().collisionResponse = true;
+                            this.punchQuaternion = getPlayerModel().quaternion;
+                            getPunchHitBox().quaternion.set(this.punchQuaternion.x, this.punchQuaternion.y, this.punchQuaternion.z, this.punchQuaternion.w);
+                            this.forwardOffset.applyQuaternion(this.punchQuaternion)
+                            this.forwardOffset.add(getPlayerModel().position)
+                            getPunchHitBox().velocity.set(this.forwardOffset.x, 0, this.forwardOffset.z)
+                        }, 300);
 
                         toPlay.clampWhenFinished = true;
                         toPlay.reset().setLoop(THREE.LoopOnce, 1).play();
                         this.punchAnimationTimerSwitch = true;
+
+                        this.bonkSound.play();
 
                     } else if (this.play == 'mousey_dash') {
                         //logic for dash
@@ -174,6 +201,8 @@ export class CharacterControls {
 
                         this.dashCooldown = 3;
                         this.dashCDSwitch = true;
+
+                        this.dashSound.play();
                     }
 
                     this.currentAction = this.play

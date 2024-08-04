@@ -9,9 +9,10 @@ import { getPlayerModel, loadPlayer, showPlayer, updatePlayerMovement } from '..
 import physicsWorld, { cleanUpPhysics } from '../three/utils/physics';
 //import CannonDebugger from 'cannon-es-debugger'
 import { CharacterControls } from '../three/utils/CharacterControls';
-import { loadGameLogic, resetGameLogic, updateGameLogic } from '../three/loaders/GameLogicLoader';
+import { loadGameLogic, resetGameLogic, stopAllBGM, updateGameLogic } from '../three/loaders/GameLogicLoader';
 import { GameStateStore } from '../ngrx-signal-store/gamestate.store';
 import { Timer } from 'three/examples/jsm/misc/Timer.js';
+import { AudioService } from '../three/audio.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,7 @@ export class MindSpaceService {
   private characterControls: CharacterControls;
   private gameStateStore = inject(GameStateStore);
   public gameTimer: Timer;
+  private audioService = inject(AudioService);
   //private cannonDebugger = CannonDebugger(this.scene, physicsWorld);
 
   constructor(private renderer: RendererService) {
@@ -34,6 +36,7 @@ export class MindSpaceService {
     stopRecursiveStarfieldBlink();
     resetGameLogic();
     this.gameStateStore.resetPlayerHP();
+    stopAllBGM();
   }
 
   //for support me and how to play view, is just no load player
@@ -52,6 +55,8 @@ export class MindSpaceService {
 
     this.renderer.createWorld(canvas, this.scene, this.cam);
     this.renderer.animate();
+
+    this.audioService.setupAudioListener(this.cam);
 
     this.renderer.onUpdate((dt) => {
       updateStarfield();
@@ -76,6 +81,8 @@ export class MindSpaceService {
     this.renderer.createWorld(canvas, this.scene, this.cam);
     this.renderer.animate();
 
+    this.audioService.setupAudioListener(this.cam);
+
     this.renderer.onUpdate((dt) => {
       updateStarfield();
       //this.cannonDebugger.update();
@@ -91,12 +98,14 @@ export class MindSpaceService {
     this.scene.add(this.light);
     createOrbitControls(this.cam, canvas);
     showPlayer();
-    loadGameLogic(this.scene);
 
     this.renderer.createWorld(canvas, this.scene, this.cam);
     this.renderer.animate();
 
-    this.characterControls = new CharacterControls('mousey_breathing_idle', this.cam);
+    this.audioService.setupAudioListener(this.cam);
+    loadGameLogic(this.scene, this.audioService.getAudioListener(), this.audioService.getAudioLoader());
+
+    this.characterControls = new CharacterControls('mousey_breathing_idle', this.cam, this.audioService.getAudioListener(), this.audioService.getAudioLoader());
     this.gameTimer  = new Timer();
 
     this.renderer.onUpdate((dt) => {

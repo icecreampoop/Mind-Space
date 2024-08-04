@@ -32,9 +32,7 @@ export function loadPlayer(scene: Scene) {
             'mousey_breathing_idle.fbx',
             'mousey_punch1.fbx',
             'mousey_run.fbx',
-            'mousey_swing_dance.fbx',
-            'mousey_dash.fbx',
-            'mousey_zombie_death.fbx'
+            'mousey_dash.fbx'
         ];
 
         mixer = new AnimationMixer(playerModel);
