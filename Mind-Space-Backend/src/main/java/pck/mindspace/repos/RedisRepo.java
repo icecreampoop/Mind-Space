@@ -45,9 +45,23 @@ public class RedisRepo {
 
     // update highscore
     public boolean updateHighScore(String username, double submittedScore) {
+        // check if the user already has his own daily rank record 
+        // for redis each user can only have 1 daily rank score placing, in contrast to the hall of fame
+        Double tempScore = template.opsForZSet().score(redisKey, username);
+        if (tempScore != null){
+            if (submittedScore > tempScore){
+                template.opsForZSet().add(redisKey, username, submittedScore);
+
+                // set expire time based on singapore time to 0000
+                expiryDuration = 86400 - LocalTime.now(sgZone).toSecondOfDay();
+                template.expire(redisKey, expiryDuration, TimeUnit.SECONDS);
+                return true;
+                
+            } else return false;
+        }
 
         // if not full add straight
-        if (10 > template.opsForZSet().zCard(redisKey)) {
+        if (5 > template.opsForZSet().zCard(redisKey)) {
             template.opsForZSet().add(redisKey, username, submittedScore);
 
             // set expire time based on singapore time to 0000
@@ -56,11 +70,11 @@ public class RedisRepo {
             return true;
 
         } else {
-            // if higher than 10th pop lowest score and insert, once again 0, 0 cus
+            // if higher than 5th pop lowest score and insert, once again 0, 0 cus
             // inclusive range
             // abit stupid to for loop 1 element but the set type i found
             // isZSetOperations.TypedTuple<V>
-            // BUT I CANT FIND WHATS THE TYPE OF <V>
+            // BUT I CANT FIND WHATS THE TYPE OF <V>    (future me to say this looks like wildcard but i cba to change the code)
             for (var tuple : template.opsForZSet().rangeWithScores(redisKey, 0, 0)) {
                 if (submittedScore > tuple.getScore()) {
                     template.opsForZSet().popMin(redisKey);

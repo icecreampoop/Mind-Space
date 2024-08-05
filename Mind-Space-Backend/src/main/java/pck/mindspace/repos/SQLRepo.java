@@ -13,22 +13,25 @@ public class SQLRepo {
     @Autowired
     private JdbcTemplate template;
 
-    // TODO DO NOT EXPOSE IN GITHUB application properties revert back to env keys
-    // instead of hardcode
-
     // update personal high score
     public boolean updatePersonalHighScore(String username, double submittedScore) {
-        final int rowsAffectedByUpdate = template.update(SQLQueries.UPDATE_PERSONAL_SCORE, submittedScore, username);
+        final SqlRowSet rs = template.queryForRowSet(SQLQueries.GET_USER_INFO, username);
+        rs.next();
 
-        return rowsAffectedByUpdate > 0;
+        if (submittedScore > rs.getInt("score")) {
+            template.update(SQLQueries.UPDATE_PERSONAL_SCORE, submittedScore, username);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // update hall of fame in sql (with check)
     public boolean updateAllTimeHighScore(String username, double submittedScore) {
-        //if hall of fame not 10 yet
+        //if hall of fame not 5 yet
         SqlRowSet rs = template.queryForRowSet(SQLQueries.GET_HALL_OF_FAME_SIZE);
         rs.next();
-        if (10 > rs.getInt("count")){
+        if (5 > rs.getInt("count")){
             template.update(SQLQueries.INSERT_NEW_HALL_OF_FAME, username, submittedScore);
             return true;
         }
@@ -38,6 +41,7 @@ public class SQLRepo {
         rs.next();
         if (submittedScore > rs.getInt("score")){
             template.update(SQLQueries.DELETE_LOWEST_HALL_OF_FAME, rs.getString("username"));
+            template.update(SQLQueries.INSERT_NEW_HALL_OF_FAME, username, submittedScore);
             return true;
         }
 
@@ -84,5 +88,10 @@ public class SQLRepo {
         }
 
         return temp;
+    }
+
+    public void createNewUser(String username, String password){
+        template.update(SQLQueries.INSERT_NEW_USERPW, username, password);
+        template.update(SQLQueries.INSERT_NEW_USER_SCORE, username, 0);
     }
 }

@@ -27,10 +27,7 @@ export class BackendApiService {
   }
 
   createNewAccount(username: string, password: string) {
-    //need handle if username alr exist
-    lastValueFrom(this.httpClient.post('', ''))
-      .then()
-      .catch();
+    return this.httpClient.post('/api/create-new-account', {username: username, password: password}, {responseType: 'text'});
   }
 
   updateDBHighScore(username: string ,score: number) {

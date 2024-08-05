@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 
 import jakarta.json.JsonArray;
 import pck.mindspace.models.UserModel;
@@ -47,7 +48,7 @@ public class BackendController {
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> userLogin(
+    public ResponseEntity<String> userLogin(
             @RequestBody(required = true) UserModel user, BindingResult result) {
 
         // if someone notti call api straight without using frontend
@@ -73,23 +74,40 @@ public class BackendController {
     }
 
     @PostMapping(value = "/create-new-account", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createNewAccount(
-            UserModel user,
-            BindingResult result) {
+    public ResponseEntity<String> createNewAccount(
+        @RequestBody(required = true) UserModel user,
+        BindingResult result) {
         if (result.hasErrors()) {
             // return error response, shouldn't happen through the app though unless call
             // api straight
             // since frontend also doing validation already
+            String response = "";
+            for (FieldError error : result.getFieldErrors()) {
+                response = response + error.getDefaultMessage();
+            }
 
+            return new ResponseEntity<String>(response, HttpStatus.BAD_REQUEST);
         }
-        // TODO call censorship api with resttemplate
+
+        // profanity filter, calling external restful api
+        RestTemplate template = new RestTemplate();
+        if (template.getForObject("https://www.purgomalum.com/service/containsprofanity?text=" + user.getUsername(), String.class).equals("true")){
+            return new ResponseEntity<String>("Username contains profanity: " + template.getForObject("https://www.purgomalum.com/service/plain?text=" + user.getUsername(), String.class), HttpStatus.BAD_REQUEST);
+        }
+
+        // check username availability
+        if (!dbService.getUsernameAvailability(user.getUsername())) {
+            return new ResponseEntity<String>("Username is taken", HttpStatus.BAD_REQUEST);
+        }
+
+        dbService.createAccount(user.getUsername(), user.getPassword());
 
         return new ResponseEntity<String>("Account Created!", HttpStatus.CREATED);
     }
 
     // parameterized route
     @PutMapping("/{username}/update-score")
-    public ResponseEntity<?> updateUserHighScore(@PathVariable String username, @RequestBody(required = true) String score) {
+    public ResponseEntity<String> updateUserHighScore(@PathVariable String username, @RequestBody(required = true) String score) {
         int newHighScore = 0;
 
         // update personal best

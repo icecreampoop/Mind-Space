@@ -1,4 +1,4 @@
-import { Color, CylinderGeometry, Mesh, MeshBasicMaterial, Scene } from 'three';
+import { Color, CylinderGeometry, Mesh, MeshBasicMaterial, Scene, Audio, AudioListener, AudioLoader } from 'three';
 import { HostileBalls } from '../utils/HostileBalls';
 import physicsWorld from '../utils/physics';
 
@@ -9,7 +9,13 @@ let frequencyTimer = 0;
 let sceneRef: Scene;
 let numOfEnemies = 5;
 
-export function loadGameLogic(scene: Scene) {
+//audio
+let ballChangeSound: Audio;
+let gameStateChangeSound: Audio;
+let gameBGM: Audio;
+let gamePanicBGM: Audio;
+
+export function loadGameLogic(scene: Scene, listener: AudioListener, audioLoader: AudioLoader) {
     //setups up the stage and enemies
     sceneRef = scene;
 
@@ -23,7 +29,6 @@ export function loadGameLogic(scene: Scene) {
         scene.add(enemyArray[key].getHostileBallVisualMesh());
     }
 
-
     //spawn defense zone
     const zoneHeight = 10;
     const groundVisualMesh = new Mesh(
@@ -35,6 +40,37 @@ export function loadGameLogic(scene: Scene) {
     );
     groundVisualMesh.position.set(0, zoneHeight / 2, 0);
     scene.add(groundVisualMesh);
+
+    //audio setup
+    if (!ballChangeSound && !gamePanicBGM) {
+        ballChangeSound = new Audio(listener);
+        audioLoader.load('short-beep-tone.mp3', (buffer) => {
+            ballChangeSound.setBuffer(buffer);
+            ballChangeSound.setLoop(false);
+            ballChangeSound.setVolume(0.15);
+        });
+        gameStateChangeSound = new Audio(listener);
+        audioLoader.load('infographic-pop (floraphonic).mp3', (buffer) => {
+            gameStateChangeSound.setBuffer(buffer);
+            gameStateChangeSound.setLoop(false);
+            gameStateChangeSound.setVolume(0.3);
+        });
+        gameBGM = new Audio(listener);
+        audioLoader.load('Brave Circus Clowns (AnyStyle).mp3', (buffer) => {
+            gameBGM.setBuffer(buffer);
+            gameBGM.setLoop(true);
+            gameBGM.setVolume(0.1);
+            gameBGM.play();
+        });
+        gamePanicBGM = new Audio(listener);
+        audioLoader.load('Panic (SergeQuadrado).mp3', (buffer) => {
+            gamePanicBGM.setBuffer(buffer);
+            gamePanicBGM.setLoop(true);
+            gamePanicBGM.setVolume(0.2);
+        });
+    } else {
+        gameBGM.play();
+    }
 }
 
 export function updateGameLogic(dt): boolean {
@@ -72,6 +108,31 @@ export function updateGameLogic(dt): boolean {
     }
 
     return damage;
+}
+
+export function getBallChangeSound() {
+    if (ballChangeSound.isPlaying) ballChangeSound.stop();
+    ballChangeSound.play();
+}
+
+export function getGameStateChangeSound() {
+    if (gameStateChangeSound.isPlaying) gameStateChangeSound.stop();
+    gameStateChangeSound.play();
+}
+
+export function getGamePanicBGM() {
+    if (gameBGM.isPlaying) gameBGM.stop();
+
+    if (!gamePanicBGM.isPlaying) {
+        setTimeout(() => {
+            gamePanicBGM.play();
+        }, 1000);
+    };
+}
+
+export function stopAllBGM() {
+    if (gameBGM) gameBGM.stop();
+    if (gamePanicBGM) gamePanicBGM.stop();
 }
 
 function addBallToWorld() {

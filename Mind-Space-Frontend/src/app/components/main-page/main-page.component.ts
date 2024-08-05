@@ -15,11 +15,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
   @ViewChild('rendererCanvas', { static: true })
   public rendererCanvas!: ElementRef<HTMLCanvasElement>;
 
-  @HostListener('window:beforeunload', ['$event'])
-  public onBeforeUnload(event: BeforeUnloadEvent): void {
-    event.preventDefault();
-    event.returnValue = ''; // Triggers the confirmation dialog
-  }
+  // took out the confirmation dialog as it is detrimental UX
+  // @HostListener('window:beforeunload', ['$event'])
+  // public onBeforeUnload(event: BeforeUnloadEvent): void {
+  //   event.preventDefault();
+  //   event.returnValue = ''; // Triggers the confirmation dialog
+  // }
 
   mindSpace = inject(MindSpaceService);
   gameStateStore = inject(GameStateStore);

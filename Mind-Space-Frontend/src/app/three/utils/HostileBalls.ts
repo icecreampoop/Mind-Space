@@ -2,6 +2,7 @@ import { Body, Material, Quaternion, Sphere, Vec3 } from "cannon-es";
 import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3, Color, Scene } from "three";
 import { getGroundVisualMesh } from '../loaders/GroundLoader';
 import physicsWorld from './physics';
+import { getBallChangeSound, getGamePanicBGM, getGameStateChangeSound } from "../loaders/GameLogicLoader";
 
 export class HostileBalls {
     private mass = 100;
@@ -26,7 +27,7 @@ export class HostileBalls {
         this.ballVisualMesh = new Mesh(
             new SphereGeometry(this.ballRadius, 15, 15),
             new MeshBasicMaterial({
-                wireframe: true
+                color: new Color("#e3e3e3")
             })
         );
 
@@ -61,7 +62,7 @@ export class HostileBalls {
         return this.ballVisualMesh;
     }
 
-    updateBallAI(dt, enemyArray, scene: Scene) : boolean{
+    updateBallAI(dt, enemyArray, scene: Scene): boolean {
         //update visual mesh
         this.ballVisualMesh.position.copy(this.physicsBalldy.position);
         this.ballVisualMesh.quaternion.copy(this.physicsBalldy.quaternion);
@@ -84,12 +85,14 @@ export class HostileBalls {
                     this.attackTimer += dt;
                 }
                 if (!this.attackSwitch && this.attackTimer === 0) {
-                    this.ballVisualMesh.material['color'] = new Color("#FFED00");
+                    this.ballVisualMesh.material['color'] = new Color("#e8e100");
                     this.attackSwitch = true;
+                    getBallChangeSound();
                 }
                 if (this.attackTimer > 3 && this.redSwitch) {
-                    this.ballVisualMesh.material['color'] = new Color("#E40000");
+                    this.ballVisualMesh.material['color'] = new Color("#af0000");
                     this.redSwitch = false;
+                    getBallChangeSound();
                 }
                 if (this.attackTimer > 6) {
                     getGroundVisualMesh().material['color'] = new Color("#E40000");
@@ -97,7 +100,10 @@ export class HostileBalls {
                     scene.remove(this.ballVisualMesh);
                     physicsWorld.removeBody(this.physicsBalldy);
                     delete enemyArray[this.physicsBalldy.id];
-                    
+
+                    getGameStateChangeSound();
+                    getGamePanicBGM();
+
                     //hack workaround for damage
                     return true;
                 }

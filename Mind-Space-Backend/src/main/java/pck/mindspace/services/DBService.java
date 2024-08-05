@@ -32,17 +32,20 @@ public class DBService {
         Collections.sort(sortList, Collections.reverseOrder());
 
         while (temp.size() > 0) {
-            int tempIndex = 0;
+            String tempUsername = "";
+            int tempScore = 0;
 
             // find index of the highest string score in temp
             for (int x = 0; x < temp.size(); x++) {
                 if (Double.parseDouble(temp.get(x)[1]) == sortList.getFirst()) {
-                    tempIndex = x;
+                    tempScore = (int)Double.parseDouble(temp.get(x)[1]);
+                    tempUsername = temp.get(x)[0];
+                    temp.remove(x);
                     break;
                 }
             }
 
-            sortedScores.add(temp.remove(tempIndex));
+            sortedScores.add(new String[]{tempUsername, String.valueOf(tempScore)});
             sortList.removeFirst();
         }
 
@@ -63,7 +66,7 @@ public class DBService {
 
     public int loginCheck(String username, String password) {
 
-        // if username does not exist
+        // if username does not exist   (i could just return 1 string n split it to reduce db calls....i could)
         if (!sqlRepo.doesUsernameExist(username)) {
             return 0;
         } else if (!sqlRepo.getUserPassword(username).equals(password)) {
@@ -74,14 +77,16 @@ public class DBService {
         return 2;
     }
 
+    public boolean getUsernameAvailability(String username) {
+        return !sqlRepo.doesUsernameExist(username);
+    }
+
     public String getUserPersonalHighScore(String username) {
         return sqlRepo.getPersonalHighScore(username);
     }
 
-    // TODO sql create account
-    public String createAccount(String username, String password) {
-
-        return "";
+    public void createAccount(String username, String password) {
+        sqlRepo.createNewUser(username, password);
     }
 
     public LinkedList<String[]> getHallOfFame() {
