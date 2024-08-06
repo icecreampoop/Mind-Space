@@ -1,6 +1,8 @@
 ![MindSpace-Banner](readme-assets/mindspace-banner.png)
 # What is this?
-"Mind Space" was a milestone project submission for a 6-months professional diploma bootcamp by NUS-ISS Singapore. It is a simple 3D game with full CRUD functionality and built with full stack technologies. It comes with a "hall of fame" that tracks all time high scores, a "daily ranks" that tracks high scores of the day and expires at 0000 SGT, and a simple vulgarities filter used during account creation. It took 3 weeks to build the proof of concept + 2 days of bug fixing and polish to get it to the state it is in.
+"Mind Space" was a milestone project submission for a 6-months professional diploma bootcamp by NUS-ISS Singapore. It is a simple 3D game meant for desktop/laptop, with full CRUD functionality and built with full stack technologies. It comes with a "hall of fame" that tracks all time high scores, a "daily ranks" that tracks high scores of the day and expires at 0000 SGT, and a simple vulgarities filter used during account creation. It took 3 weeks to build the proof of concept + 2 days of bug fixing and polish to get it to the state it is in.
+
+You can try it here at: [Mind-Space](mind-space.up.railway.app/)
 
 # How it looks like (✨🔊It has sound🔊✨)
 ![Login-View](readme-assets/login-view.png)
